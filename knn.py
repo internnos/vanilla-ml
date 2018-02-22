@@ -9,40 +9,41 @@ Created on Tue Feb 13 18:52:28 2018
 from sklearn import datasets
 import matplotlib.pyplot as plt
 import numpy as np
+plt.style.use('seaborn-white')
 
 
 iris = datasets.load_iris()
 
 dataset = iris.data
 # only take 0th and 1th column for X
-X_train = iris.data[:,:2]
+point_known = iris.data[:,:2]
 # y
-y_train = iris.target
+label_known = iris.target
 
 # the hard part
 # so matplotlib does not readily support labeling based on class
 # but we know that one of the feature of plt is that a plt call would give those set of number
 # the same color
-category = np.unique(y_train)
+category = np.unique(label_known)
 for i in category:
-    upper = np.max(np.where(y_train == i))
-    lower = np.min(np.where(y_train == i))
-    plt.scatter(X_train[lower:upper,0],X_train[lower:upper,1],label=i)
+    upper = np.max(np.where(label_known == i))  
+    lower = np.min(np.where(label_known == i))
+    plt.scatter(point_known[lower:upper,0],point_known[lower:upper,1],label=i)
 
 # Unknown class of a point
-X_test = np.array([[5.7,3.3],[5.6,3.4]])
-plt.scatter(X_test[:,0],X_test[:,1], label='?')
+point_unknown = np.array([[5.7,3.3],[5.6,3.4]])
+plt.scatter(point_unknown[:,0],point_unknown[:,1], label='?')
 plt.legend()
 #-------------
 # Euclidean Distance
-diff = X_train - X_test.reshape(len(X_test),1,len(X_test))
+diff = point_known - point_unknown.reshape(len(point_unknown),1,len(point_unknown))
 distance = (diff**2).sum(2)
-distance = distance.reshape(len(X_test),1,len(X_train))
+distance = distance.reshape(len(point_unknown),1,len(point_known))
 
 
 #return sorted index of distance
 dist_index = np.argsort(distance)
-label = y_train[dist_index]
+label = label_known[dist_index]
 
 k = 5
 
@@ -50,13 +51,13 @@ k = 5
 
 label = label[:,:,:k]
 
-result = []    
-for i in range(len(X_test)):
+y_unknown = []    
+for i in range(len(point_unknown)):
     values,counts =  np.unique(label[i], return_counts=True)
     ind = np.argmax(counts)
-    result.append(values[ind])
+    y_unknown.append(values[ind])
 
-result
+
 
 
 
