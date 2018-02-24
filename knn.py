@@ -16,7 +16,7 @@ iris = datasets.load_iris()
 
 dataset = iris.data
 # only take 0th and 1th column for X
-point_known = iris.data[:,:2]
+data_known = iris.data[:,:2]
 # y
 label_known = iris.target
 
@@ -28,17 +28,17 @@ category = np.unique(label_known)
 for i in category:
     upper = np.max(np.where(label_known == i))  
     lower = np.min(np.where(label_known == i))
-    plt.scatter(point_known[lower:upper,0],point_known[lower:upper,1],label=i)
+    plt.scatter(data_known[lower:upper,0],data_known[lower:upper,1],label=i)
 
-# Unknown class of a point
-point_unknown = np.array([[5.7,3.3],[5.6,3.4]])
-plt.scatter(point_unknown[:,0],point_unknown[:,1], label='?')
+# Unknown class of a data
+data_unknown = np.array([[5.7,3.3],[5.6,3.4]])
+plt.scatter(data_unknown[:,0],data_unknown[:,1], label='?')
 plt.legend()
 #-------------
 # Euclidean Distance
-diff = point_known - point_unknown.reshape(len(point_unknown),1,len(point_unknown))
+diff = data_known - data_unknown.reshape(data_unknown.shape[0],1,data_unknown.shape[1])
 distance = (diff**2).sum(2)
-distance = distance.reshape(len(point_unknown),1,len(point_known))
+distance = distance.reshape(data_unknown.shape[0],1,data_known.shape[0])
 
 
 #return sorted index of distance
@@ -48,14 +48,13 @@ label = label_known[dist_index]
 k = 5
 
 #keep the rank
-
 label = label[:,:,:k]
 
-y_unknown = []    
-for i in range(len(point_unknown)):
+label_unknown = []    
+for i in range(len(data_unknown)):
     values,counts =  np.unique(label[i], return_counts=True)
     ind = np.argmax(counts)
-    y_unknown.append(values[ind])
+    label_unknown.append(values[ind])
 
 
 

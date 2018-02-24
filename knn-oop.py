@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Thu Feb 22 21:50:45 2018
+
+@author: amajidsinar
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Tue Feb 20 23:30:12 2018
 
 @author: amajidsinar
@@ -8,78 +16,77 @@ Created on Tue Feb 20 23:30:12 2018
 
 class Knn:
     import numpy as np
-    from sklearn import datasets
     from scipy import stats
     import matplotlib.pyplot as plt
+    import random
     plt.style.use("seaborn-white")
     
-    def __init__(self,data_known,label_known,data_unknown,k):
-        self.data_known = data_known
-        self.label_known = label_known
-        self.data_unknown = data_unknown
-        self.k = k
+    def split(self,data_known,label_known,training_percentage):
+        import random
+        #data_set and label is static
+        data_set = data_known
+        label = label_known
+        #take percentage*len(data)
+        index = random.sample(range(len(data_known)),int(training_percentage*len(data_known)))
+        data_known = data_set[index]
+        label_known =  label[index]
+        data_unknown = np.delete(data_set, index, axis=0)
+        label_unknown = np.delete(label, index, axis=0)
+        return (data_known,label_known,data_unknown,label_unknown)
     def plot(self,title,xlabel,ylabel):
         category = np.unique(label_known)
         for i in category:
-            upper = np.max(np.where(self.label_known == i))
-            lower = np.min(np.where(self.label_known == i))
-            plt.scatter(self.data_known[lower:upper,0],self.data_known[lower:upper,1],label=i)
+            upper = np.max(np.where(label_known == i))
+            lower = np.min(np.where(label_known == i))
+            plt.scatter(data_known[lower:upper,0],data_known[lower:upper,1],label=i)
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-        plt.scatter(self.data_unknown[:,0],self.data_unknown[:,1], label='?')
+        plt.scatter(data_unknown[:,0],data_unknown[:,1], label='?')
         plt.legend()
-    def predict(self):
-        #euclidian distance
-        diff = self.data_known - self.data_unknown.reshape(len(self.data_unknown),1,len(self.data_unknown))
+    def euclidean_distance(self,data_known,data_unknown):
+        diff = data_known - data_unknown.reshape((data_unknown.shape[0],1,data_unknown.shape[1]))
         distance = (diff**2).sum(2)
-        distance = distance.reshape(len(self.data_unknown),1,len(self.data_known))
+        distance = distance.reshape(data_unknown.shape[0],1,data_known.shape[0])
+        return distance
+    def predict(self,data_known,data_unknown,label_known,k):
         #sort label
-        dist_index = np.argsort(distance)
-        label = self.label_known[dist_index]
+        dist_index = np.argsort(self.euclidean_distance(data_known,data_unknown))
+        label = label_known[dist_index]
         #only pick until kth index
-        label = label[:,:,:self.k]
+        label = label[:,:,:k]
         #return the mode
         label_unknown = []
-        for i in range(len(self.data_unknown)):
+        for i in range(len(data_unknown)):
             values,counts =  np.unique(label[i], return_counts=True)
             ind = np.argmax(counts)
             label_unknown.append(values[ind])
         return label_unknown
+
     
         
 #load iris
+import numpy as np
+from sklearn import datasets
 iris = datasets.load_iris()
-dataset = iris.data
 
-#set input
+#data_known = iris.data[:,:2]
+#label_known = iris.target
+#data_unknown = np.array([[5.7,3.3],[5.6,3.4]])
+
 data_known = iris.data[:,:2]
 label_known = iris.target
-data_unknown = np.array([[5.7,3.3],[5.6,3.4]])
 
-#create instance of knn
-
-knn_1 = Knn(data_known,label_known,data_unknown,1)
-knn_2 = Knn(data_known,label_known,data_unknown,2)
-knn_3 = Knn(data_known,label_known,data_unknown,3)
-knn_4 = Knn(data_known,label_known,data_unknown,4)
-knn_5 = Knn(data_known,label_known,data_unknown,5)
-knn_6 = Knn(data_known,label_known,data_unknown,6)
-knn_7 = Knn(data_known,label_known,data_unknown,7)
-knn_8 = Knn(data_known,label_known,data_unknown,8)
-knn_9 = Knn(data_known,label_known,data_unknown,9)
-knn_10 = Knn(data_known,label_known,data_unknown,10)
+knn = Knn()
+data_known, label_known, data_unknown, label_unknown = knn_1.split(data_known,label_known,0.4)
+#set input
+#first = trainingAndTest(iris.data, iris.target, 0.4)
+#data_known,label_known,data_unknown,label_unknown = first()
+predict1 = knn.predict(data_known, data_unknown, label_known,1)
+predict2 = knn.predict(data_known, data_unknown, label_known,2)
+predict3 = knn.predict(data_known, data_unknown, label_known,3)
+predict4 = knn.predict(data_known, data_unknown, label_known,4)
+predict5 = knn.predict(data_known, data_unknown, label_known,5)
 
 
-print(knn_1.predict())
-print(knn_2.predict())
-print(knn_3.predict())
-print(knn_4.predict())
-print(knn_5.predict())
-print(knn_6.predict())
-print(knn_7.predict())
-print(knn_8.predict())
-print(knn_9.predict())
-print(knn_10.predict())
 
-knn_1.plot('Iris dataset','sepal length', 'sepal width')
