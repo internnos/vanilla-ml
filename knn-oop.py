@@ -33,6 +33,7 @@ class Knn:
         data_unknown = np.delete(data_set, index, axis=0)
         label_unknown = np.delete(label, index, axis=0)
         return (data_known,label_known,data_unknown,label_unknown)
+    
     def plot(self,title,xlabel,ylabel):
         category = np.unique(label_known)
         for i in category:
@@ -44,11 +45,13 @@ class Knn:
         plt.ylabel(ylabel)
         plt.scatter(data_unknown[:,0],data_unknown[:,1], label='?')
         plt.legend()
+        
     def euclidean_distance(self,data_known,data_unknown):
         diff = data_known - data_unknown.reshape((data_unknown.shape[0],1,data_unknown.shape[1]))
         distance = (diff**2).sum(2)
         distance = distance.reshape(data_unknown.shape[0],1,data_known.shape[0])
         return distance
+    
     def predict(self,data_known,data_unknown,label_known,k):
         #sort label
         dist_index = np.argsort(self.euclidean_distance(data_known,data_unknown))
