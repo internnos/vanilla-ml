@@ -18,7 +18,7 @@ import numpy as np
     
 
 class Knn():
-    def __init__(self, k, dist='euc'):
+    def __init__(self, k, dist='l1'):
         avDist = ['l1', 'manhattan']
         if dist not in avDist:
             pass
@@ -72,18 +72,26 @@ def split(data_known,label_known,training_percentage):
 
 #load iris
 from sklearn import datasets
-iris = datasets.load_iris()
+digits = datasets.load_digits()
 
-data_known = iris.data[:,:2]
-label_known = iris.target
+data_known = digits.data
+label_known = digits.target
 
-data_known,label_known,data_unknown,label_unknown = split(data_known,label_known,0.9)
+data_known,label_known,data_unknown,label_unknown = split(data_known,label_known,0.8)
 
-knn1 = Knn(5,dist='eu')
-knn1.fit(data_known,label_known)
-label_predict = knn1.predict(data_unknown)
-performance = np.mean(label_predict == label_unknown)
+val_accuracy = []
+for i in np.arange(1,40):
+    knn = Knn(i)
+    knn.fit(data_known,label_known)
+    label_predict = knn.predict(data_unknown)
+    performance = np.mean(label_predict == label_unknown)
+    val_accuracy.append(performance)
 
+import matplotlib.pyplot as plt
+plt.title('accuracy vs k plot of digit recognition')
+plt.xlabel('k')
+plt.ylabel('accuracy')
+plt.plot(val_accuracy)
 
 
 
