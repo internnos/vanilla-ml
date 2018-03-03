@@ -15,30 +15,19 @@ Created on Tue Feb 20 23:30:12 2018
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-plt.style.use("seaborn-white")
+    
 
-class Model:
-    def evaluate(self):
-        print(self.predict())
-        print(self.label_unknown)
-        return np.mean(self.predict() == self.label_unknown)
-
-class Knn(Model):
-   
+class Knn():
     def __init__(self, k, dist='euc'):
-        avDist = ['euc', 'man']
+        avDist = ['l1', 'manhattan']
         if dist not in avDist:
             pass
         self.k = k
         self.dist = dist
-        
     
-    def fit(self,data_known,label_known,data_unknown,label_unknown):
+    def fit(self,data_known,label_known):
         self.data_known = data_known
         self.label_known = label_known
-        self.data_unknown = data_unknown
-        self.label_unknown = label_unknown
         
     def L1_distance(self):
         diff = self.data_known - self.data_unknown.reshape((self.data_unknown.shape[0],1,self.data_unknown.shape[1]))
@@ -47,14 +36,9 @@ class Knn(Model):
     def manhattan(self):
         diff = self.data_known - self.data_unknown.reshape((self.data_unknown.shape[0],1,self.data_unknown.shape[1]))
         return np.abs(diff).sum(2)
-        
-        
-    def L2_distance(self):
-        diff = self.data_known - self.data_unknown.reshape((self.data_unknown.shape[0],1,self.data_unknown.shape[1]))
-        return np.sqrt((diff**2).sum(2))
     
-    
-    def predict(self):
+    def predict(self, data_unknown):
+        self.data_unknown = data_unknown
         #sort label
         if self.dist == 'euc':
             dist_index = np.argsort(self.L2_distance())
@@ -96,8 +80,11 @@ label_known = iris.target
 data_known,label_known,data_unknown,label_unknown = split(data_known,label_known,0.9)
 
 knn1 = Knn(5,dist='eu')
-#knn1.fit(data_known,label_known,data_unknown,label_unknown)
-#performance = knn1.evaluate()
+knn1.fit(data_known,label_known)
+label_predict = knn1.predict(data_unknown)
+performance = np.mean(label_predict == label_unknown)
+
+
 
 
 
